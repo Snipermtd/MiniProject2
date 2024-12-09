@@ -1,0 +1,54 @@
+services:
+  trivaserver:
+    image: triviaserver:latest
+    deploy:
+        replicas: 2
+    ports:
+        - 50051:50051
+    networks:
+        - db-network
+
+  questions:
+    image: cassandra:4.1
+    deploy:
+        replicas: 1
+    networks:
+        - db-network  
+    volumes:
+        -  mptwo-questions-vol:/var/lib/cassandra
+    environment:
+        - CASSANDRA_USER=admin
+        - CASSANDRA_PASSWORD=admin
+
+  mysql-1:
+    image: mysql:9.1
+    deploy:
+        replicas: 1
+    networks:
+        - db-network
+    volumes:
+        - mptwo-db-vol-1:/var/lib/mysql 
+    environment:
+        - MYSQL_ROOT_PASSWORD=mysqlPassword
+
+  mysql-2:
+    image: mysql:9.1
+    deploy:
+        replicas: 1
+    networks:
+        - db-network
+    volumes:
+        - mptwo-db-vol-2:/var/lib/mysql
+    environment:
+        - MYSQL_ROOT_PASSWORD=mysqlPassword      
+
+volumes:
+    mptwo-db-vol-1:
+    mptwo-db-vol-2:
+    mptwo-questions-vol:
+  
+networks:
+    db-network:
+        driver: overlay
+        internal: true
+        
